@@ -1,0 +1,2 @@
+# WeChatApp
+模仿抖音的微信小程序，基于SSM的后台，基于SpringBoot的接口,利用zookeeper进行远程对bgm的下载
