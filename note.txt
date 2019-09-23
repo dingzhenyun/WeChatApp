@@ -1,0 +1,2 @@
+1、linux安装redis、zookeeper(windows本地也可以)
+2、设置tomcat的虚拟目录
