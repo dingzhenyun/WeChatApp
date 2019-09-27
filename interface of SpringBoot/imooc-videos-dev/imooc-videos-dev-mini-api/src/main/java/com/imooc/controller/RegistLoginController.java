@@ -29,44 +29,48 @@ public class RegistLoginController extends BasicController {
 	@ApiOperation(value="用户注册", notes="用户注册的接口")
 	@PostMapping("/regist")
 	public IMoocJSONResult regist(@RequestBody Users user) throws Exception {
-		
+		String regex = "([A-Z]|[a-z]|[1-9]|-|)([A-Z]|[a-z]|[0-9]|-|){0,}";
 		// 1. 判断用户名和密码必须不为空
 		if (StringUtils.isBlank(user.getUsername()) || StringUtils.isBlank(user.getPassword())) {
 			return IMoocJSONResult.errorMsg("用户名和密码不能为空");
 		}
-		
-		// 2. 判断用户名是否存在
-		boolean usernameIsExist = userService.queryUsernameIsExist(user.getUsername());
-		
-		// 3. 保存用户，注册信息
-		if (!usernameIsExist) {
-			user.setNickname(user.getUsername());
-			user.setPassword(MD5Utils.getMD5Str(user.getPassword()));
-			user.setFansCounts(0);
-			user.setReceiveLikeCounts(0);
-			user.setFollowCounts(0);
-			userService.saveUser(user);
-		} else {
-			return IMoocJSONResult.errorMsg("用户名已经存在，请换一个再试");
+		if(user.getUsername().matches(regex)){
+			// 2. 判断用户名是否存在
+			boolean usernameIsExist = userService.queryUsernameIsExist(user.getUsername());
+
+			// 3. 保存用户，注册信息
+			if (!usernameIsExist) {
+				user.setNickname(user.getUsername());
+				user.setPassword(MD5Utils.getMD5Str(user.getPassword()));
+				user.setFansCounts(0);
+				user.setReceiveLikeCounts(0);
+				user.setFollowCounts(0);
+				userService.saveUser(user);
+			} else {
+				return IMoocJSONResult.errorMsg("用户名已经存在，请换一个再试");
+			}
+
+			user.setPassword("");
+
+	//		String uniqueToken = UUID.randomUUID().toString();
+	//		redis.set(USER_REDIS_SESSION + ":" + user.getId(), uniqueToken, 1000 * 60 * 30);
+	//
+	//		UsersVO userVO = new UsersVO();
+	//		BeanUtils.copyProperties(user, userVO);
+	//		userVO.setUserToken(uniqueToken);
+
+			UsersVO userVO = setUserRedisSessionToken(user);
+
+			return IMoocJSONResult.ok(userVO);
+		}else {
+			return IMoocJSONResult.errorMsg("用户名不能为中文");
 		}
-		
-		user.setPassword("");
-		
-//		String uniqueToken = UUID.randomUUID().toString();
-//		redis.set(USER_REDIS_SESSION + ":" + user.getId(), uniqueToken, 1000 * 60 * 30);
-//		
-//		UsersVO userVO = new UsersVO();
-//		BeanUtils.copyProperties(user, userVO);
-//		userVO.setUserToken(uniqueToken);
-		
-		UsersVO userVO = setUserRedisSessionToken(user);
-		
-		return IMoocJSONResult.ok(userVO);
+
 	}
 	
 	public UsersVO setUserRedisSessionToken(Users userModel) {
 		String uniqueToken = UUID.randomUUID().toString();
-		redis.set(USER_REDIS_SESSION + ":" + userModel.getId(), uniqueToken, 1000 * 60 * 30);
+		redis.set(USER_REDIS_SESSION + ":" + userModel.getId(), uniqueToken, 1000 * 60 * 1);
 		
 		UsersVO userVO = new UsersVO();
 		BeanUtils.copyProperties(userModel, userVO);
@@ -79,8 +83,7 @@ public class RegistLoginController extends BasicController {
 	public IMoocJSONResult login(@RequestBody Users user) throws Exception {
 		String username = user.getUsername();
 		String password = user.getPassword();
-		
-//		Thread.sleep(3000);
+
 		
 		// 1. 判断用户名和密码必须不为空
 		if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
@@ -100,7 +103,40 @@ public class RegistLoginController extends BasicController {
 			return IMoocJSONResult.errorMsg("用户名或密码不正确, 请重试...");
 		}
 	}
-	
+
+
+	@ApiOperation(value="用户密码修改", notes="用户密码修改的接口")
+	@PostMapping("/updatepwd")
+	public IMoocJSONResult updatepwd(@RequestBody Users user) throws Exception {
+		String username = user.getUsername();
+		System.out.println("username___"+username);
+		String newPassword = user.getPassword();
+		String id=user.getId();
+
+		// 1. 判断用户名和密码必须不为空
+		if (StringUtils.isBlank(username) || StringUtils.isBlank(newPassword)) {
+			return IMoocJSONResult.ok("用户名或新密码不能为空...");
+		}
+		// 2. 判断用户名字是否正确
+		Users testuser = userService.queryUserInfo(id);
+		System.out.println(testuser.getUsername()+"--"+testuser.getPassword()+"--"+testuser.getId());
+		if((testuser!=null) && (testuser.getUsername().equals(username))){
+			testuser.setPassword(MD5Utils.getMD5Str(newPassword));
+			userService.updateUserInfo(testuser);
+			//userService.updateUserPassword(testuser);
+		}
+
+		Users userResult = userService.queryUserForLogin(username,
+				MD5Utils.getMD5Str(newPassword));
+		// 3. 返回
+		if (userResult != null ) {
+			userResult.setPassword("");
+			UsersVO userVO = setUserRedisSessionToken(userResult);
+			return IMoocJSONResult.ok(userVO);
+		} else {
+			return IMoocJSONResult.errorMsg("修改失败, 请重试...");
+		}
+	}
 	@ApiOperation(value="用户注销", notes="用户注销的接口")
 	@ApiImplicitParam(name="userId", value="用户id", required=true, 
 						dataType="String", paramType="query")

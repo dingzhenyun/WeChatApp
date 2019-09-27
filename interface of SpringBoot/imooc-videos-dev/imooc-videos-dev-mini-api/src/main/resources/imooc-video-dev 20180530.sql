@@ -1,17 +1,4 @@
-/*
-Navicat MariaDB Data Transfer
 
-Source Server         : .
-Source Server Version : 100122
-Source Host           : localhost:3306
-Source Database       : imooc-video-dev
-
-Target Server Type    : MariaDB
-Target Server Version : 100122
-File Encoding         : 65001
-
-Date: 2018-05-30 19:37:40
-*/
 
 SET FOREIGN_KEY_CHECKS=0;
 

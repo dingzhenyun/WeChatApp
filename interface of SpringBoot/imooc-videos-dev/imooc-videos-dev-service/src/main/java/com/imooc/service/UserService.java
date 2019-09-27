@@ -9,6 +9,11 @@ public interface UserService {
 	 * @Description: 判断用户名是否存在
 	 */
 	public boolean queryUsernameIsExist(String username);
+
+	/**
+	 * @Description: 根据用户名字查询用户信息
+	 */
+	public Users queryUserByUsername(String username);
 	
 	/**
 	 * @Description: 保存用户(用户注册)
@@ -54,4 +59,5 @@ public interface UserService {
 	 * @Description: 举报用户
 	 */
 	public void reportUser(UsersReport userReport);
+	public void updateUserPassword(Users user);
 }

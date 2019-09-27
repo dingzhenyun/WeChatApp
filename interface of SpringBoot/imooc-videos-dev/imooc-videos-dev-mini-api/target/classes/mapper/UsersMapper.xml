@@ -23,7 +23,10 @@
   <update id="reduceReceiveLikeCount" parameterType="String">
   	update users set receive_like_counts=receive_like_counts-1 where id=#{userId}
   </update>
-  
+
+  <select id="queryUserByUsername" parameterType="String" resultType="com.imooc.pojo.Users">
+      select * from users where username=#{username}
+  </select>
   
   
   

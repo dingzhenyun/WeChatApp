@@ -18,7 +18,13 @@ Page({
           icon: 'none',
           duration: 3000
         })
-      } else {
+      } else if(!username.match('([A-Z]|[a-z]|[1-9]|-|)([A-Z]|[a-z]|[0-9]|-|){0,}')){
+        wx.showToast({
+          title: '用户名不能为中文或下划线',
+          icon: 'none',
+          duration: 3000
+        })
+      }else {
         var serverUrl = app.serverUrl;
         wx.showLoading({
           title: '请等待...',

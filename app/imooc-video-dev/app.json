@@ -1,6 +1,6 @@
 {
   "pages": [
-      
+    
     "pages/index/index",
     "pages/videoinfo/videoinfo",
     "pages/videotest/videotest",
@@ -9,7 +9,8 @@
     "pages/mine/mine",
     "pages/userRegist/regist",
     "pages/chooseBgm/chooseBgm",
-    "pages/searchVideo/searchVideo"
+    "pages/searchVideo/searchVideo",
+    "pages/updatepwd/updatepwd"
   ],
   "window": {
     "backgroundTextStyle": "light",

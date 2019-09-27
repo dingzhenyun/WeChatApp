@@ -185,7 +185,12 @@ Page({
       }
     })
   },
-
+  update: function(){
+      wx.navigateTo({
+        url: '../updatepwd/updatepwd',
+      })
+  },
+ 
   changeFace: function () {
     var me = this;
     wx.chooseImage({
